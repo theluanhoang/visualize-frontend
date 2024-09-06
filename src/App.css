@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(92, 188, 252);
+
+}
+
+.container {
+    padding: 10px;
+    margin: 0 auto;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.xterm .xterm-viewport {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

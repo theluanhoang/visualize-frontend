@@ -3,22 +3,24 @@ import io from 'socket.io-client';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
+import './Terminal.css';
 
 const TerminalComponent = () => {
   const terminalRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const socketRef = useRef<SocketIOClient.Socket | null>(null);
-
+  const commandBuffer = useRef<string>('');
+  const prompt = '\b \x1b[32mUSER@HOST MINGW64 /d/code/visualize-project/visualize-backend \x1b[0m';
   useEffect(() => {
-    if (terminalRef.current != null) {
+    if (terminalRef.current) {
       const term = new Terminal({
         cursorBlink: true,
         fontFamily: 'Consolas, "Courier New", monospace',
         fontSize: 14,
         theme: {
-          background: '#0C0C0C',
-          foreground: '#00FF00',
-          cursor: '#FFFFFF',
+          background: '#282a36', // Dark Git Bash background
+          foreground: '#ffffff', // Light text color
+          cursor: '#ffffff', // White cursor like Git Bash
         },
       });
 
@@ -33,32 +35,50 @@ const TerminalComponent = () => {
       socketRef.current = socket;
 
       socket.on('connect', () => {
-        term.write('Connected to server\r\n');
+        term.writeln(prompt); // Green prompt with hostname and path
+        term.write("\b $ ")
       });
 
       socket.on('output', (data: string) => {
-        term.write(data);
+        console.log("output:::", data)
+        const temps = data.split('\n');
+        temps.forEach((temp) => {
+          term.writeln('\b ' + temp);
+
+        })
+        term.writeln(prompt);
+        term.write("\b $ ")
       });
 
+      
+
       term.onData((data) => {
-        if (socketRef.current) {
-          socketRef.current.emit('input', data);
-        }
-        console.log("data:::", data);
-        
-        if (data === '\u0008') { // Backspace
-          term.write('\b \b'); // Xóa ký tự trước con trỏ
-        } else if (data === '\u007F') { // Delete key
-            console.log('delete key');
-            
-          term.write('\x1b[3~'); // Xóa ký tự sau con trỏ
+        if (data === '\r') { // Enter key
+          if (socketRef.current) {
+            socketRef.current.emit('input', commandBuffer.current + '\r');
+          }
+          commandBuffer.current = '';
+          term.write('\r\n');
+        } else if (data === '\u0008') { 
+          if (commandBuffer.current.length > 0) {
+            commandBuffer.current = commandBuffer.current.slice(0, -1);
+            term.write('\b \b'); 
+          }
+        } else if (data === '\u007F') { 
+          if (commandBuffer.current.length > 0) {
+            commandBuffer.current = commandBuffer.current.slice(0, -1);
+            term.write('\b \b');
+          }
         } else {
-          term.write(data); // Hiển thị các ký tự khác
+          commandBuffer.current += data;
+          term.write(data);
         }
       });
 
       const handleResize = () => {
-        fitAddon.fit();
+        if (termRef.current) {
+          fitAddon.fit();
+        }
       };
 
       window.addEventListener('resize', handleResize);
@@ -73,7 +93,7 @@ const TerminalComponent = () => {
     }
   }, []);
 
-  return <div ref={terminalRef} style={{ width: '100%', height: '100%' }} />;
+  return <div id='terminal' ref={terminalRef} />;
 };
 
 export default TerminalComponent;
