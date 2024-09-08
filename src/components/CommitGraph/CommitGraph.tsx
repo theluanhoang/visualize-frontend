@@ -1,8 +1,10 @@
 import SHA1 from "crypto-js/sha1";
 import gsap from "gsap";
+import Konva from "konva";
 import React, { useEffect, useRef, useState } from "react";
 import { Arrow, Circle as KonvaCircle, Layer, Stage, Text } from "react-konva";
 import { ICircle } from "../../interfaces/ITree";
+import Square from "../shapes/Square";
 import "./CommitGraph.css";
 
 interface IConnection {
@@ -50,16 +52,12 @@ const CommitGraph: React.FC = () => {
 
   useEffect(() => {
     if (circles.length > 0) {
-      // Tính toán giá trị cực trị của x
       const maxX = Math.max(...circles.map((circle) => circle.x));
       const minX = Math.min(...circles.map((circle) => circle.x));
-  
-      // Cập nhật chiều rộng của canvas để bao gồm khoảng cách từ minX đến maxX
-      // Bù thêm không gian cho phần tử mới bên trái
-      const extraSpace = 200; // Thay đổi giá trị này tùy thuộc vào không gian bạn muốn thêm
+      
+      const extraSpace = 200;
       setDynamicWidth(Math.max(dimensions.width, maxX - minX + extraSpace));
   
-      // Cập nhật chiều cao của canvas
       const maxY = Math.max(...circles.map((circle) => circle.y));
       setDynamicHeight(maxY + 100);
     }
@@ -104,16 +102,14 @@ const CommitGraph: React.FC = () => {
           branch: ["main"],
         },
       };
-      console.log('Setting initial commit:', initialCommit);
+
       setCircles([initialCommit]);
       setCurrentCommit(initialCommit);
       setNewCommit(initialCommit);
     }
   }, [coordinates.x, coordinates.y]);
   
-  console.log('circles:::', circles)
-
-  const setCursorPointer = (e: any, cursorType: string) => {
+  const setCursorPointer = (e: Konva.KonvaEventObject<MouseEvent>, cursorType: string) => {
     const container = e.target.getStage()?.container();
     if (container) {
       container.style.cursor = cursorType;
@@ -205,6 +201,7 @@ const CommitGraph: React.FC = () => {
           className="canvas-wrapper"
         >
           <Layer>
+           <Square />
             {connections.map((connection) => {
               const { from, to, isBranch } = connection;
               const x = from.x;
