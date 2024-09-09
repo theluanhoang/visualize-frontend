@@ -201,7 +201,7 @@ const CommitGraph: React.FC = () => {
           className="canvas-wrapper"
         >
           <Layer>
-           <Square />
+           <Square x={20} y={0} branch={"Main"} />
             {connections.map((connection) => {
               const { from, to, isBranch } = connection;
               const x = from.x;
