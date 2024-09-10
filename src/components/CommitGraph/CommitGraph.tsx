@@ -27,6 +27,7 @@ const CommitGraph: React.FC = () => {
   const [newCommit, setNewCommit] = useState<ICircle | null>();
   const [currentCommit, setCurrentCommit] = useState<ICircle | null>();
   const [connections, setConnections] = useState<IConnection[]>([]);
+  const [HEAD, setHEAD] = useState("");
 
   useEffect(() => {
     const updateSize = () => {
@@ -71,6 +72,9 @@ const CommitGraph: React.FC = () => {
       const textNode = stageRef.current.findOne(
         `#text-${newCommit.commit.hash}`
       );
+      const tagNode = stageRef.current.findOne(
+        `#tag-branch-${newCommit.commit.hash}`
+      );
 
       if (circleNode && textNode) {
         gsap.fromTo(
@@ -83,6 +87,12 @@ const CommitGraph: React.FC = () => {
           textNode,
           { y: textNode.y() - 100 },
           { y: textNode.y(), duration: 0.5, ease: "bounce.out" }
+        );
+
+        gsap.fromTo(
+          tagNode,
+          { y: tagNode.y() - 100 },
+          { y: tagNode.y(), duration: 0.5, ease: "bounce.out" }
         );
       }
     }
@@ -106,6 +116,7 @@ const CommitGraph: React.FC = () => {
       setCircles([initialCommit]);
       setCurrentCommit(initialCommit);
       setNewCommit(initialCommit);
+      setHEAD(initialCommit.commit.hash);
     }
   }, [coordinates.x, coordinates.y]);
   
@@ -129,6 +140,7 @@ const CommitGraph: React.FC = () => {
         date: new Date(),
         message: `Commit: ${circles.length}`,
         branch: ["main", "feature-z"],
+        isHEAD: true,
       },
     };
 
@@ -144,6 +156,7 @@ const CommitGraph: React.FC = () => {
     setCircles([...circles, circle]);
     setNewCommit(circle);
     setCurrentCommit(circle);
+    setHEAD(circle.commit.hash);
   };
 
   const handleBranch = () => {
@@ -201,7 +214,6 @@ const CommitGraph: React.FC = () => {
           className="canvas-wrapper"
         >
           <Layer>
-           <Square x={20} y={0} branch={"Main"} />
             {connections.map((connection) => {
               const { from, to, isBranch } = connection;
               const x = from.x;
@@ -262,6 +274,10 @@ const CommitGraph: React.FC = () => {
                     setCursorPointer(e, "default");
                   }}
                 />
+                {
+                  circle.commit.hash === HEAD && <Square id={`tag-branch-${circle.commit.hash}`} x={circle.x + 20} y={circle.y + 40} branch={"main"} />
+                }
+
               </div>
             ))}
           </Layer>

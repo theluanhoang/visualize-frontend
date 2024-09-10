@@ -3,42 +3,49 @@ import { useEffect, useRef, useState } from "react";
 import { Arrow, Group, Rect, Text } from "react-konva";
 
 type SquareProps = {
+  id?: string;
   x: number;
   y: number;
   branch: string;
 };
 
-const Square = ({ x, y, branch }: SquareProps) => {
-  const [textSize, setTextSize] = useState({ width: 100, height: 50 });
-  const textRef = useRef<Konva.Text>(null); // Dùng kiểu Konva.Text cho ref
+interface DimensionsText {
+  width: number;
+  height: number;
+}
+
+const Square = ({ x, y, branch, id }: SquareProps) => {
+  const [textSize, setTextSize] = useState<DimensionsText>({ width: 0, height: 0 });
+  const textRef = useRef<Konva.Text>(null);
 
   useEffect(() => {
     if (textRef.current) {
       const width = textRef.current.width();
       const height = textRef.current.height();
-      setTextSize({ width: width , height: height + 10 });
+      setTextSize({ width: width + 20, height: height + 10 });
     }
   }, [branch]);
 
-  const rectX = 10; // X của Rect
-  const rectY = 0; // Y của Rect
+  console.log("{ x, y, branch, id }:::", { x, y, branch, id })
+
+  const rectX = 20;
+  const rectY = 0;
   const cornerRadius = 10;
 
   const arrowStartX = rectX + cornerRadius / 2;
-  const arrowStartY = rectY + textSize.height - cornerRadius / 2; // Góc trái dưới của Rect, đã tính cả chiều cao
+  const arrowStartY = rectY + cornerRadius / 2;
 
-  const arrowEndX = arrowStartX - 30;
-  const arrowEndY = arrowStartY + 30;
-
+  const arrowEndX = arrowStartX - 20;
+  const arrowEndY = arrowStartY - 20;
   return (
-    <Group x={x} y={y}>
+    <Group id={id || undefined} x={x} y={y}>
       <Arrow
-        points={[arrowStartX, arrowStartY, arrowEndX, arrowEndY]} // Vị trí mũi tên
+        points={[arrowStartX, arrowStartY, arrowEndX, arrowEndY]}
         fill="#FF66D3"
         stroke="#FF66D3"
         strokeWidth={10}
-        pointerLength={10}
-        pointerWidth={15}
+        pointerLength={8}
+        pointerWidth={8}
         tension={0}
       />
       <Rect
@@ -49,19 +56,19 @@ const Square = ({ x, y, branch }: SquareProps) => {
         fill="#FF66D3"
         stroke="white"
         strokeWidth={2}
-        cornerRadius={cornerRadius} // Bo tròn góc
+        cornerRadius={cornerRadius}
       />
       <Text
-        ref={textRef} // Dùng ref để lấy kích thước của Text
-        x={rectX} // Căn giữa ngang dựa trên vị trí của Rect
-        y={rectY} // Căn giữa dọc dựa trên vị trí của Rect
-        width={textSize.width} // Đặt chiều rộng của Text bằng với Rect
-        height={textSize.height} // Đặt chiều cao của Text bằng với Rect
+        ref={textRef}
+        x={rectX}
+        y={rectY}
+        width={textSize.width > 0 ? textSize.width : undefined}
+        height={textSize.height > 0 ? textSize.height : undefined}
         text={branch}
         fontSize={18}
         fill="#000"
-        align="center" // Căn giữa ngang
-        verticalAlign="middle" // Căn giữa dọc
+        align="center"
+        verticalAlign="middle"
       />
     </Group>
   );
