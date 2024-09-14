@@ -27,7 +27,8 @@ const CommitGraph: React.FC = () => {
   const [newCommit, setNewCommit] = useState<ICircle | null>();
   const [currentCommit, setCurrentCommit] = useState<ICircle | null>();
   const [connections, setConnections] = useState<IConnection[]>([]);
-  const [HEAD, setHEAD] = useState("");
+  const [branch, setBranch] = useState("");
+  const [head, setHead] = useState("");
 
   useEffect(() => {
     const updateSize = () => {
@@ -76,7 +77,7 @@ const CommitGraph: React.FC = () => {
         `#tag-branch-${newCommit.commit.hash}`
       );
 
-      if (circleNode && textNode) {
+      if (circleNode && textNode && tagNode) {
         gsap.fromTo(
           circleNode,
           { y: circleNode.y() - 100 },
@@ -116,7 +117,7 @@ const CommitGraph: React.FC = () => {
       setCircles([initialCommit]);
       setCurrentCommit(initialCommit);
       setNewCommit(initialCommit);
-      setHEAD(initialCommit.commit.hash);
+      setBranch(initialCommit.commit.hash);
     }
   }, [coordinates.x, coordinates.y]);
   
@@ -156,7 +157,7 @@ const CommitGraph: React.FC = () => {
     setCircles([...circles, circle]);
     setNewCommit(circle);
     setCurrentCommit(circle);
-    setHEAD(circle.commit.hash);
+    setBranch(circle.commit.hash);
   };
 
   const handleBranch = () => {
@@ -174,26 +175,12 @@ const CommitGraph: React.FC = () => {
         },
       };
 
-      const leftBranchCircle = {
-        x: currentCommit.x - 100,
-        y: currentCommit.y + 100,
-        commit: {
-          label: `C${circles.length + 1}`,
-          hash: SHA1(Math.random().toString(36).slice(-8)).toString(),
-          author: "Hoàng Thế Luân",
-          date: new Date(),
-          message: `Branch from C${circles.length + 1}`,
-          branch: ["main", "feature-z", "new-branch"],
-        },
-      };
-
       const newConnections: IConnection[] = [
         { from: currentCommit, to: rightBranchCircle, isBranch: true },
-        { from: currentCommit, to: leftBranchCircle, isBranch: true },
       ];
 
       setConnections([...connections, ...newConnections]);
-      setCircles([...circles, rightBranchCircle, leftBranchCircle]);
+      setCircles([...circles, rightBranchCircle]);
       setNewCommit(rightBranchCircle);
       setCurrentCommit(rightBranchCircle);
     }
@@ -221,8 +208,8 @@ const CommitGraph: React.FC = () => {
               let points = [x, y, to.x, to.y - 20];
 
               if (isBranch) {
-                points = [x, y, x, y + 50, to.x, y + 50, to.x, to.y - 20];
-              }
+                const branchOffset = 50; // You can customize this value to stretch more or less
+                points = [x, y, x, y + branchOffset, to.x, y + branchOffset, to.x, to.y - 20];              }
 
               return (
                 <Arrow
@@ -275,7 +262,12 @@ const CommitGraph: React.FC = () => {
                   }}
                 />
                 {
-                  circle.commit.hash === HEAD && <Square id={`tag-branch-${circle.commit.hash}`} x={circle.x + 20} y={circle.y + 40} branch={"main"} />
+                  circle.commit.hash === branch && (
+                  <>
+                  <Square id={`tag-branch-${circle.commit.hash}`} x={circle.x + 40} y={circle.y - 13} branch={"main"} direction="left-middle"/>
+                  {/* <Square x={circle.x + 20} y={circle.y + 40} branch="Main" direction="top-right" />
+                  <Square x={200} y={100} branch="Feature" direction="top-right" /> */}
+                  </>)
                 }
 
               </div>

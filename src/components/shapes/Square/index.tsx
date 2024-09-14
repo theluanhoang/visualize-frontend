@@ -7,6 +7,7 @@ type SquareProps = {
   x: number;
   y: number;
   branch: string;
+  direction: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-middle' | 'left-middle' | 'right-middle' | 'bottom-middle';
 };
 
 interface DimensionsText {
@@ -14,7 +15,7 @@ interface DimensionsText {
   height: number;
 }
 
-const Square = ({ x, y, branch, id }: SquareProps) => {
+const Square = ({ x, y, branch, id, direction }: SquareProps) => {
   const [textSize, setTextSize] = useState<DimensionsText>({ width: 0, height: 0 });
   const textRef = useRef<Konva.Text>(null);
 
@@ -26,17 +27,66 @@ const Square = ({ x, y, branch, id }: SquareProps) => {
     }
   }, [branch]);
 
-  console.log("{ x, y, branch, id }:::", { x, y, branch, id })
-
   const rectX = 20;
   const rectY = 0;
   const cornerRadius = 10;
 
-  const arrowStartX = rectX + cornerRadius / 2;
-  const arrowStartY = rectY + cornerRadius / 2;
+  let arrowStartX = rectX + cornerRadius / 2;
+  let arrowStartY = rectY + cornerRadius / 2;
+  let arrowEndX = arrowStartX - 20;
+  let arrowEndY = arrowStartY - 20;
 
-  const arrowEndX = arrowStartX - 20;
-  const arrowEndY = arrowStartY - 20;
+  switch (direction) {
+    case 'top-left':
+      arrowStartX = rectX + cornerRadius / 2;
+      arrowStartY = rectY + cornerRadius / 2;
+      arrowEndX = arrowStartX - 20;
+      arrowEndY = arrowStartY - 20;
+      break;
+    case 'top-middle':
+      arrowStartX = rectX + textSize.width / 2;
+      arrowStartY = rectY + cornerRadius / 2;
+      arrowEndX = arrowStartX;
+      arrowEndY = arrowStartY - 20;
+      break;
+    case 'top-right':
+      arrowStartX = rectX + textSize.width - cornerRadius / 2;
+      arrowStartY = rectY + cornerRadius / 2;
+      arrowEndX = arrowStartX + 20;
+      arrowEndY = arrowStartY - 20;
+      break;
+    case 'left-middle':
+      arrowStartX = rectX + cornerRadius / 2;
+      arrowStartY = rectY + textSize.height / 2;
+      arrowEndX = arrowStartX - 30;
+      arrowEndY = arrowStartY;
+      break;
+    case 'right-middle':
+      arrowStartX = rectX + textSize.width - cornerRadius / 2;
+      arrowStartY = rectY + textSize.height / 2;
+      arrowEndX = arrowStartX + 20;
+      arrowEndY = arrowStartY;
+      break;
+    case 'bottom-left':
+      arrowStartX = rectX + cornerRadius / 2;
+      arrowStartY = rectY + textSize.height - cornerRadius / 2;
+      arrowEndX = arrowStartX - 20;
+      arrowEndY = arrowStartY + 20;
+      break;
+    case 'bottom-middle':
+      arrowStartX = rectX + textSize.width / 2;
+      arrowStartY = rectY + textSize.height - cornerRadius / 2;
+      arrowEndX = arrowStartX;
+      arrowEndY = arrowStartY + 20;
+      break;
+    case 'bottom-right':
+      arrowStartX = rectX + textSize.width - cornerRadius / 2;
+      arrowStartY = rectY + textSize.height - cornerRadius / 2;
+      arrowEndX = arrowStartX + 20;
+      arrowEndY = arrowStartY + 20;
+      break;
+  }
+
   return (
     <Group id={id || undefined} x={x} y={y}>
       <Arrow
