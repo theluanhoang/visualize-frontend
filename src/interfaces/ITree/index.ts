@@ -34,5 +34,8 @@ export interface ICommit {
 export interface ICircle {
   x: number;
   y: number;
+  color: string;
+  branch: string;
   commit: ICommit;
+  childrenCommitHash: string[];
 }

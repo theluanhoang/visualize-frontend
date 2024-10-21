@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.1",
     "@react-spring/web": "^9.7.4",
     "@types/socket.io-client": "^1.4.36",
     "crypto-js": "^4.2.0",

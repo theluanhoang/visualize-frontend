@@ -8,6 +8,7 @@ type SquareProps = {
   y: number;
   branch: string;
   direction: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-middle' | 'left-middle' | 'right-middle' | 'bottom-middle';
+  backgroundColor?: string;
 };
 
 interface DimensionsText {
@@ -15,7 +16,7 @@ interface DimensionsText {
   height: number;
 }
 
-const Square = ({ x, y, branch, id, direction }: SquareProps) => {
+const TagComponent = ({ x, y, branch, id, direction, backgroundColor }: SquareProps) => {
   const [textSize, setTextSize] = useState<DimensionsText>({ width: 0, height: 0 });
   const textRef = useRef<Konva.Text>(null);
 
@@ -91,8 +92,8 @@ const Square = ({ x, y, branch, id, direction }: SquareProps) => {
     <Group id={id || undefined} x={x} y={y}>
       <Arrow
         points={[arrowStartX, arrowStartY, arrowEndX, arrowEndY]}
-        fill="#FF66D3"
-        stroke="#FF66D3"
+        fill={backgroundColor || "#FF66D3"}
+        stroke={backgroundColor || "#FF66D3"}
         strokeWidth={10}
         pointerLength={8}
         pointerWidth={8}
@@ -103,7 +104,7 @@ const Square = ({ x, y, branch, id, direction }: SquareProps) => {
         y={rectY}
         width={textSize.width}
         height={textSize.height}
-        fill="#FF66D3"
+        fill={backgroundColor || "#FF66D3"}
         stroke="white"
         strokeWidth={2}
         cornerRadius={cornerRadius}
@@ -124,4 +125,4 @@ const Square = ({ x, y, branch, id, direction }: SquareProps) => {
   );
 };
 
-export default Square;
+export default TagComponent;
